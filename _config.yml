@@ -6,10 +6,10 @@ url: http://cafory.github.io
 resume_site: http://cafory.github.io
 github: https://github.com/cafory/
 baseurl: ''
-description: Actually, less is more!
-meta_description: chongchongchong
-motto: It's our wits that make us men.
-banner: 学而不思则罔，思而不学则殆。
+description: 士不可以不弘毅，任重而道远。
+meta_description: Use it or lose it.
+motto: Use it or lose it.
+banner: 壁立千仞，无欲则刚。
 
 #permalink: /:categories/:year/:month/:day/:title/
 permalink: /:year/:month/:day/:title/
