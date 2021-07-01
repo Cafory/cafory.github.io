@@ -6,10 +6,8 @@
 		    <p>Post on {{ page.date | date: "%b %d, %Y" }} by <a href="/about">{{ site.author }}</a></p>
 		-->
 		    <h1>{{ site.motto }}</h1>
-    {% else %}
-	    <a href="/" class="navbar-brand">
+    {% else %}	
         <img src="{{ '/styles/images/logo.jpg' | prepend: site.baseurl }}" width="200" height="200">
-      </a>
 	    <p>{{ site.description }}</p>
     {% endif %}
   </div>
