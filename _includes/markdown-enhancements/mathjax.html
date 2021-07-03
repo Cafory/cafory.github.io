@@ -6,7 +6,7 @@
 {%- assign _mathjax_autoNumber = __return -%}
 
 <script type="text/x-mathjax-config">
-	var _config = { tex: {
+	var _config = { tex2jax: {
 		inlineMath: [['$','$']]
 		processEscapes: true
 	}};
@@ -16,3 +16,4 @@
 	MathJax.Hub.Config(_config);
 </script>
 <script type="text/javascript" src="{{ _sources.mathjax }}" async></script>
+
