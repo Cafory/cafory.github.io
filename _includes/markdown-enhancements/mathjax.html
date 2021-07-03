@@ -6,8 +6,9 @@
 {%- assign _mathjax_autoNumber = __return -%}
 
 <script type="text/x-mathjax-config">
-	var _config = { tex2jax: {
+	var _config = { tex2: {
 		inlineMath: [['$','$']]
+		processEscapes: true
 	}};
 	{%- if _mathjax_autoNumber == true -%}
 		_config.TeX = { equationNumbers: { autoNumber: "all" } };
