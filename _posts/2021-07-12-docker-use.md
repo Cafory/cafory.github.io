@@ -5,8 +5,6 @@ tags: Docker
 
 # 简介
 
------
-
 Docker 是一个开源的应用容器引擎，基于 [Go 语言](https://www.runoob.com/go/go-tutorial.html) 并遵从 Apache2.0 协议开源。
 
 Docker 可以让开发者打包他们的应用以及依赖包到一个轻量级、可移植的容器中，然后发布到任何流行的 Linux 机器上，也可以实现虚拟化。
@@ -15,11 +13,10 @@ Docker 可以让开发者打包他们的应用以及依赖包到一个轻量级�
 
 Docker 从 17.03 版本之后分为 CE（Community Edition: 社区版） 和 EE（Enterprise Edition: 企业版），我们用社区版就可以了。
 
-
+<!--more-->
 
 # 安装
 
----
 
 详细教程可见菜鸟教程的[Docker 教程 ](https://www.runoob.com/docker/docker-tutorial.html)以及[C语言中文网的教程](http://c.biancheng.net/view/3121.html))。
 
@@ -39,7 +36,6 @@ Docker 从 17.03 版本之后分为 CE（Community Edition: 社区版） 和 EE�
 
 ![image-20210713154053337](https://gitee.com/cafory/images-store/raw/master/Image/image-20210713154053337.png)
 
----
 
 #### **可能出现的问题**
 
@@ -51,13 +47,10 @@ Docker 从 17.03 版本之后分为 CE（Community Edition: 社区版） 和 EE�
 
 # 使用
 
----
 
 本节主要介绍Docker的使用方法，内容来源于**菜鸟教程**以及**C语言中文网** 。
 
 ## 一些概念
-
----
 
 Docker包括三个基本概念：  
 
@@ -70,7 +63,7 @@ Docker包括三个基本概念：
 Docker架构如下表所示：  
 
 | 概念                   | 说明                                                         |
-| :--------------------- | :----------------------------------------------------------- |
+| :--------------------------- | :----------------------------------------------------------- |
 | Docker 镜像(Images)    | Docker 镜像是用于创建 Docker 容器的模板，比如 Ubuntu 系统。  |
 | Docker 容器(Container) | 容器是独立运行的一个或一组应用，是镜像运行时的实体。         |
 | Docker 客户端(Client)  | Docker 客户端通过命令行或者其他工具使用 Docker SDK (https://docs.docker.com/develop/sdk/) 与 Docker 的守护进程通信。 |
@@ -80,7 +73,6 @@ Docker架构如下表所示：
 
 ## 镜像（Image）
 
----
 
 如果曾经做过 VM 管理员，则可以把 [Docker](http://c.biancheng.net/docker/) 镜像理解为 VM 模板，VM 模板就像停止运行的 VM，而 Docker 镜像就像停止运行的容器；而作为一名研发人员，则可以将镜像理解为类（Class）。
 
@@ -131,7 +123,6 @@ Docker架构如下表所示：
 
 ## 容器（Container）
 
----
 
 当我们安装 Docker 的时候，会涉及两个主要组件：Docker 客户端和 Docker daemon（有时也被称为“服务端”或者“引擎”）。
 
