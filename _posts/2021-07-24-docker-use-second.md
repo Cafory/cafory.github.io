@@ -51,21 +51,21 @@ docker cp <file path in host>  <containerID> ：<file path in container>
 [In Host]: docker exec -it cptest /bin/bash  # 打开容器
 [In Container]: pwd    	                     # 查看当前路径
 [In Container]: mkdir /cptest                # 创建测试文件夹
-[In Container]: ls							 # 查看当前文件夹
+[In Container]: ls                           # 查看当前文件夹
 ```
 
 结果如下所示：
 
 ![image-20210723211551263](https://gitee.com/cafory/images-store/raw/master/Image/image-20210723211551263.png)
 
-OK，目前已经将测试文件夹创建完毕，接下来执行如下命令复制测试文件___cptest.txt___以及测试文件夹___cptest___。
+OK，目前已经将测试文件夹创建完毕，接下来执行如下命令复制测试文件***cptest.txt***以及测试文件夹***cptest***。
 
 ``` shell
 [In Host]: docker cp .\cptest.txt cptest:/cptest/     # 复制文件
-[In Host]: docker cp .\cptest\ cptest:/cptest/		  # 复制文件夹
+[In Host]: docker cp .\cptest\ cptest:/cptest/        # 复制文件夹
 [In Host]: docker exec -it cptest /bin/bash           # 打开容器
-[In Container]: cd /cptest/   						  # 打开测试文件夹
-[In Container]: ls									  # 查看文件夹内容
+[In Container]: cd /cptest/                           # 打开测试文件夹
+[In Container]: ls                                    # 查看文件夹内容
 ```
 
 结果如下所示：
