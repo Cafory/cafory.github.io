@@ -138,7 +138,7 @@ daemon 实现了 Docker 引擎的 API。
 
 执行以下命令以启动容器：
 
-> `docker [container] run <options> <im- age>:<tag> <app>`  
+> `docker [container] run <options> <image>:<tag> <app>`  
 
 例如执行
 
@@ -204,7 +204,7 @@ daemon 实现了 Docker 引擎的 API。
 执行此指令默认不会进入容器内，如果想要进入容器，可以执行以下命令：  
 
 > + `docker attach CONTAINER-ID`：此命令进入容器，退出容器后，容器停止
-> + `docker exec CONTAINER-ID`：此命令进入容器，退出容器后，容器继续后台运行
+> + `docker exec CONTAINER-ID <command/app>`：此命令进入容器，退出容器后，容器继续后台运行
 
 当然如果不在容器里面无法通过`exit`命令停止容器，此时我们可以通过如下命令停止容器：
 
