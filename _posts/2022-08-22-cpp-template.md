@@ -61,11 +61,13 @@ tags: C++
     {
         int a = 1, b = 2;
         cout << Add(a,b) << endl;
+        cout<<Add<int>(a,b)<<endl;
+        cout<<Add<double>(a,b)<<endl;
     }
 
     ```
 
-2. 显示实例化 : 在函数名后的<>中指定模板参数的实际类型
+2. 显式实例化 : 显式指定类型。实例化则和特化略有不同，它没有了表示模板参数列表的<>，这说明它已经是实例化的东西了，但是为了和普通的函数或者类相区别，需要加上template这个关键字。如果把这个关键字去除，那么就可以发现它和普通的定义没有什么两样了。这里需要注意的是：若同一组模板实参的显式特化出现于显式实例化之前，则显式实例化无效果。
 
     ```cpp
     template<class T>
@@ -73,12 +75,14 @@ tags: C++
     {
         return a + b;
     }
+
+    template Add(int a); // 显式实例化
+
     int main()
     {
         int a = 1;
         double b = 2.2;
-        cout<<Add<int>(a,b)<<endl;
-        cout<<Add<double>(a,b)<<endl;
+        
     }
     ```
 
@@ -182,7 +186,9 @@ tags: C++
     };
 
     ```
-+ 编译器不能为类模板推断模板类型参数，因此,类模板实例化与函数模板实例化不同，类模板实例化**必须要在类模板名字后跟<>**，然后将实例化的类型放在<>中即可，类模板名字不是真正的类，而实例化的结果才是真正的类。
++ 模板实例化
+
+     与函数模板类似，但编译器不能为类模板推断模板类型参数，因此,类模板实例化与函数模板实例化不同，类模板实例化**必须要在类模板名字后跟<>**，然后将实例化的类型放在<>中即可，类模板名字不是真正的类，而实例化的结果才是真正的类。
 
 + 类模板的成员函数
 
@@ -496,6 +502,47 @@ tags: C++
     expand函数中的逗号表达式(printarg(args), 0)，先执行printarg(args)，再得到逗号表达式的结果0。同时还用到了C++11的另外一个特性——初始化列表，通过初始化列表来初始化一个变长数组,{(printarg(args), 0)…}将会展开成((printarg(arg1),0), (printarg(arg2),0), (printarg(arg3),0), etc… )，最终会创建一个元素值都为0的数组int arr[sizeof…(Args)]。由于是逗号表达式，在创建数组的过程中会先执行逗号表达式前面的部分printarg(args)打印出参数，也就是说在构造int数组的过程中就将参数包展开了，这个数组的目的纯粹是为了在数组构造的过程展开参数包。
 
 + 接收可变模板参数作为形参的函数，在使用args的时候必须利用`args...`解包，且最后一个形参为可变模板参数`T ... args`。
+
+### 6 细节问题
+
++ 模板类可以有虚函数吗？
+
+    模板类可以有虚函数和纯虚函数，但模板成员函数不可以是虚函数。因为编译器都期望在处理类的定义的时候就能确定这个类的虚函数表的大小，如果允许有类的虚成员模板函数，那么就必须要求编译器提前知道程序中所有对该类的该虚成员模板函数的调用，而这是不可行的。 
+
+    例子
+
+    ```cpp
+    #include <iostream>
+    
+    template <class T>
+    class Base
+    {
+    public:
+        virtual void f1() { std::cout << "Base'f1 is called." << std::endl; } 
+        virtual void f2() = 0; 
+        virtual void test(){} // 编译报错
+    };
+    
+    template <class T>
+    class Dev : public Base<T>
+    {
+    public:
+        void f1() { std::cout << "Dev'f1 is called." << std::endl; }
+        void f2() { std::cout << "Dev'f2 is called." << std::endl; }
+    };
+    
+    int main()
+    {
+        Base<int> *p = new Dev<int>;
+        p->f1();
+        return 0;
+    }
+
+    ```
+
++ 模板第一步实例化时是在编译器确定的。
+
++ 模板实例化过多会造成代码膨胀的问题。
 
     
 
