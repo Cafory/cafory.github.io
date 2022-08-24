@@ -64,20 +64,21 @@ tags: algorithm
 + 代码实现：
 
     ```cpp
-    void selectionSort(vector<int> & nums)
+    void selectionSort(vector<int> &nums)
     {
-        int min_i = 0; // 保存未排序序列的最小值的下标
-        for( int i = 0;  i < nums.size() ; i++ )
+        int min_i; // 保存未排序序列的最小值的下标
+        for (int i = 0; i < nums.size(); i++)
         {
             // 外层循环控制获取第 i 小的值的下标
-            for( int j  = i ; j < nums.size() ; j++ )
+            min_i = i; // 将min_i重置为当前未排序序列的第一个下标
+            for (int j = i; j < nums.size(); j++)
             {
                 // 获取未排序序列的最小值下标
-                if( nums[j] <  nums[min_i] )
-                    min_i = j
+                if (nums[j] < nums[min_i])
+                    min_i = j;
             }
-        }
-        swap( nums[i], nums[min_i] );
+            swap(nums[i], nums[min_i]);
+        } 
     }
     ```
 
