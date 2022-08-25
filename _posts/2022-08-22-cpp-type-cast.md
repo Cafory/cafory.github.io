@@ -109,7 +109,7 @@ C++继承并扩展C语言的传统类型转换方式，提供了功能更加强�
 + 定义
 
     ```cpp
-    reinterpret_cast <T*> content //重解释类型转换，几乎什么都可以转。
+    reinterpret_cast <T*> content //重解释类型转换，几乎什么都可以转。编译时转换
     ```
 
 + reinterpret_cast的机制是对二进制数据进行重新的解释，不会改变原来的格式，而static_cast则会改变原来的格式。
