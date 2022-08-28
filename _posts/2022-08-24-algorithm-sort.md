@@ -346,3 +346,50 @@ tags: algorithm
 
     ![](/My_Assets/heapSort.gif)
 
++ 代码实现：
+
+    ```cpp
+    void adjustHeap(vector<int> & nums, int start, int end)
+    {
+        // 相当于在start位置新增了一个节点
+        // 现在要调整原始堆，使其成为大根堆
+        int dad = start;
+        int son  = dad * 2 + 1;
+        while (son <= end)
+        {   
+            if( son + 1 <= end && nums[son + 1] >  nums[son] )
+                son += 1;
+            
+            if( nums[dad] >= nums[son] ) 
+                break;
+            else
+            {
+                // 此时，父亲节点小于孩子节点，交换
+                // 并继续向下调整
+                swap(nums[dad], nums[son]);
+                dad  = son;
+                son  = dad * 2 + 1;
+            }
+        }
+    }
+
+    void heapSort(vector<int> & nums)
+    {
+        for(int i = nums.size() / 2  - 1 ; i >= 0 ; i--)
+        {
+            // 从下往上，调整父节点，构建大根堆
+            adjustHeap(nums, i, nums.size() - 1);
+        }
+
+        for(int i = nums.size() - 1 ; i > 0 ; i--)
+        {
+            // 大根堆堆顶一定是当前未排序序列的最大值
+            // 通过交换到未排序序列最后并入已排序序列中
+            swap(nums[i], nums[0]);
+            // 交换之后重新构建大根堆
+            // 继续找下一个最大元素
+            adjustHeap(nums, 0, i - 1);
+        }
+    }
+    ```
+
