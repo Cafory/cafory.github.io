@@ -11,8 +11,12 @@ tags: algorithm
 
 <!--more-->
 
-以下算法皆是将无序数组排序为升序数组，实现语言为C++。
 
+算法概况如下图所示:
+
+![](/My_Assets/sort.svg)
+
+以下算法皆是将无序数组排序为升序数组，实现语言为C++。
 
 
 ### 1 冒泡排序
@@ -389,6 +393,193 @@ tags: algorithm
             // 交换之后重新构建大根堆
             // 继续找下一个最大元素
             adjustHeap(nums, 0, i - 1);
+        }
+    }
+    ```
+
+### 8 计数排序
+
++ 算法原理：
+
+    计数排序（counting sort）就是一种牺牲内存空间来换取低时间复杂度的排序算法，同时它也是一种不基于比较的算法。这里的不基于比较指的是数组元素之间不存在比较大小的排序算法，我们知道，用分治法来解决排序问题最快也只能使算法的时间复杂度接近 O(nlogn) ，即**基于比较的时间复杂度存在下界 O(nlogn)** ，而不基于比较的排序算法可以突破这一下界。当输入的元素是 n 个 0 到 k 之间的整数时，它的运行时间是 O(n + k)。
+
+    算法步骤：
+
+    1. 找到序列的最大值 max_v 最小值 min_v
+
+    2. 创建 k = ( max_v - min_v + 1 ) 个桶，保存在最大值最小值之间各个整数的个数。
+
+    3. 遍历各个桶，重构有序序列
+
+    动图如下：
+
+    ![](/My_Assets/countingSort.gif)
+
++ 代码实现：
+
+    ```cpp
+    void countingSort(vector<int> & nums)
+    {
+        int max_v = nums[0] , min_v = nums[0];
+        for(int & num :nums)
+        {
+            // 获取最大值最小值
+            max_v = max(max_v, num);
+            min_v = min(min_v, num);
+        }
+        
+        // 创建 max_v - min_v + 1 计数器 
+        vector<int> counter ( max_v - min_v + 1, 0 );
+        
+        for(int & num :nums)
+        {
+            // 计数
+            counter[ num - min_v ]++;
+        }
+
+        int index = 0;
+        for(int i = 0 ; i < counter.size() ; i++ )
+        {
+            // 构建排序序列
+            for( int j = 0 ; j < counter[i] ; j++ )
+                nums[index++] = i + min_v;
+        }
+    }
+    ```
+
+### 9 桶排序
+
++ 算法原理：
+
+    桶排序（Bucket sort）或所谓的箱排序，是一个排序算法，工作的原理是将数组分到有限数量的桶里。每个桶再个别排序（有可能再使用别的排序算法或是以递归方式继续使用桶排序进行排序），最后依次把各个桶中的记录列出来记得到有序序列。桶排序并不是比较排序，他不受到O(nlogn)下限的影响。
+
+    算法步骤：
+
+    1. 确定桶的个数
+
+    2. 分桶
+
+    3. 每个桶单独排序
+
+    4. 合并排序结果
+
+    5. 得到有序序列
+
+    动图如下：
+
+    ![](/My_Assets/bucketSort.gif)
+
++ 算法实现：
+
+    ```cpp
+    void buckerSort(vector<int> & nums)
+    {
+        int max_v = nums[0] , min_v = nums[0];
+        for(int & num :nums)
+        {
+            // 获取最大值最小值
+            max_v = max(max_v, num);
+            min_v = min(min_v, num);
+        }
+        // 设定桶的容量
+        int bucket_size = 3;
+        // 创建桶
+        int bucket_cnt = ( max_v - min_v ) / bucket_size + 1;
+        vector<vector<int>> buckets(bucket_cnt, vector<int>());
+        
+        // 分桶
+        int bucket_id = 0;
+        for(int i = 0; i < nums.size() ; i++)
+        {
+            buckets[ ( nums[i] - min_v ) / bucket_size ].push_back( nums[i] );
+        }
+
+        // 每个桶单独排序
+        for(int i = 0 ; i < bucket_cnt ; i++)
+        {
+            bubbleSort( buckets[i] ) ; // 排序算法可以自己选择
+        }
+
+        // 合并排序结果
+        int index = 0;
+        for(int i = 0 ; i < bucket_cnt ; i++)
+        {
+            // 构建有序序列
+            for( int j = 0 ; j < buckets[i].size() ;j++ )
+                nums[index++] = buckets[i][j];
+        }
+    }
+    ```
+
+### 10 基数排序
+
++ 算法原理
+
+    基数排序(radix sort)是一种非比较型整数排序算法，其原理是将整数按位数切割成不同的数字，然后按每个位数分别比较。由于整数也可以表达字符串（比如名字或日期）和特定格式的浮点数，所以基数排序也不是只能使用于整数。
+
+    基于两种不同的排序顺序，我们将基数排序分为
+
+    + LSD（Least significant digital）：排序方式由数值的最右边（低位）开始
+
+    + MSD（Most significant digital）：由数值的最左边（高位）开始。
+
+    注意一点：
+
+    LSD的基数排序适用于位数少的数列，如果位数多的话，使用MSD的效率会比较好。
+
+    MSD的方式由高位数为基底开始进行分配，但在分配之后并不马上合并回一个数组中，而是在每个“桶子”中建立“子桶”，将每个桶子中的数值按照下一数位的值分配到“子桶”中。在进行完最低位数的分配后再合并回单一的数组中。
+
+    下面以LSD为例，算法步骤如下：
+
+    1. 确定数组中的最大元素有几位（MAX）（确定执行的轮数）
+
+    2. 创建0~9个桶（桶的底层是队列），因为所有的数字元素都是由0~9的十个数字组成
+
+    3. 依次判断每个元素的个位，十位至MAX位，存入对应的桶中，出队，存入原数组；直至MAX轮结束输出数组。
+
+    动图如下：
+
+    ![](/My_Assets/radixSort.gif)
+
++ 代码实现：
+
+    ```cpp
+    void radixSort(vector<int> & nums)
+    {
+        int base = 10, cnt = 1;
+        // 获取数据最大位数
+        for(int & num : nums)
+        {
+            if(num / base > 0)
+            {
+                base *= 10;
+                cnt++;
+            }
+        }
+        // 创建桶0-9
+        vector<queue<int>> buckets(10, queue<int>());
+        base = 1; // 表示要处理哪一位的数字
+        while (cnt >= 1)
+        {
+            for(int & num : nums)
+            {
+                // 下式 根据base 获取对应位置的数字
+                // ( num % ( base * 10 ) / base
+                buckets[ ( num % ( base * 10 ) ) / base ].push(num);
+            }
+
+            for(int index = 0, i = 0; i < 10 ; i++)
+            {
+                
+                while( !buckets[i].empty() )
+                {
+                    nums[index++] = buckets[i].front();
+                    buckets[i].pop();
+                }
+            }
+            printVec(nums);cout<<endl;
+            cnt--;
+            base *= 10; // 处理下一位  
         }
     }
     ```
