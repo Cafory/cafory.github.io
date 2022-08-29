@@ -123,7 +123,7 @@ tags: C++
     }
     ```
 
-### 友元类
+### 2 友元类
 
 + 友元类中的所有成员函数都是另一个类的友元函数，可以直接访问友元类中的所有成员；
 
@@ -176,6 +176,154 @@ tags: C++
 
     ```
 
+### 3 模板类与友元函数
 
++ 模板类的约束模板友元函数
+
+    约束模板友元，指的是**模板友元函数实例化取决于模板类被实例化时的类型**。
+
+
+    写法一 ： `T(function) = T(class)`
+
+    这种写法是保持模板友元函数的参数类型和模板类的参数类型一致。可以将友元函数的声明和定义分开，也可以直接在模板类内部直接定义友元函数。需要注意两种实现写法上的不同。
+
+    1） 友元函数声明和定义分开
+
+    ```cpp
+    template <typename T> class A;
+    template <typename T> void test(A<T> & a); // 模板声明
+
+    template <typename T>
+    class A
+    {
+    public:
+        friend void test<T> ( A<T> & a ); // 声明友元函数
+        
+        
+    };
+
+    template <typename T>
+    void test( A<T> & a )
+    {
+        cout<<"test"<<endl;
+    }
+                                                        
+    
+    int main()
+    {
+        A<int> a;
+        test(a);
+        return 0;
+    }
+    ```
+
+    2） 友元函数直接定义在模板类内部
+
+    ```cpp
+    template <typename T>
+    class A
+    {
+    public:
+        friend void test ( A<T> & a ) // 声明友元函数
+        {
+            cout<<"test"<<endl;
+        }
+        
+    };
+
+    int main()
+    {
+        A<int> a;
+        test(a);
+        return 0;
+    }
+    ```
+
+    写法二 ： `T(function) = class<T>`
+
+    ```cpp
+    template <typename T> void test(T & a); 
+
+    template <typename T>
+    class A
+    {
+    public:
+        friend void test<A<T>> ( A<T> & a ); // 声明友元函数
+    };
+
+    template <typename T>
+    void test( T & a )
+    {
+        cout<<"test"<<endl;
+    }
+                                          
+    
+    int main()
+    {
+        A<int> a;
+        test(a);
+        return 0;
+    }
+    ```
+
++ 模板类的非约束模板友元函数
+
+    这里所谓的约束模板友元，指的是友元函数的所有实例化版本都是模板类的每一个实例化版本的友元。
+
+    写法一：`T(function) = T(class)`
+
+    这种写法是保持模板友元函数的参数类型和模板类的参数类型一致。
+
+    ```cpp
+    template <typename T>
+    class A
+    {
+    public:
+        
+        template <typename D>
+        friend void test ( A<D> & a ); // 声明友元函数
+    };
+
+    template <typename T>
+    void test( A<T> & a )
+    {
+        cout<<"test"<<endl;
+    }
+                                                        
+    
+    int main()
+    {
+        A<int> a;
+        test(a);
+        return 0;
+    }
+    ```
+
+    写法二：`T(function) = class<T>`
+
+    ```cpp
+    template <typename T>
+    class A
+    {
+    public:
+        
+        template <typename D>
+        friend void test ( D & a ); // 声明友元函数
+    };
+
+    template <typename T>
+    void test( T & a )
+    {
+        cout<<"test"<<endl;
+    }
+                                                        
+    
+    int main()
+    {
+        A<int> a;
+        test(a);
+        return 0;
+    }
+    ```
     
 
