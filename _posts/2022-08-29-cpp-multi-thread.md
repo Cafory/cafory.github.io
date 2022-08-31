@@ -27,21 +27,21 @@ tags: C++
 
     多个线程同时执行任务肯定存在线程间的同步和互斥：
 
-    + **线程同步**：指线程之间所具有的一种制约关系，一个线程的执行依赖另外一个线程的消息，当它没有得到另一个线程的消息时应等待，直到消息到达时才被唤醒；
+    + **线程同步**：同步指维护任务片段的先后顺序，指线程之间所具有的一种制约关系，一个线程的执行依赖另外一个线程的消息，当它没有得到另一个线程的消息时应等待，直到消息到达时才被唤醒；
 
-    + **线程互斥**: 指对于共享的进程系统资源，每个线程访问时的排他性。当有若干个线程都要使用某一个共享资源时，任何时刻最多只允许一个线程去使用，其他线程必须等待，知道占用占用资源者释放该资源。线程互斥可以看成是一种特殊的线程同步。
+    + **线程互斥**: 指对于共享的进程系统资源，每个线程访问时的排他性。互斥就是保证资源同一时刻只能被一个进程使用；互斥是为了保证数据的一致性。当有若干个线程都要使用某一个共享资源时，任何时刻最多只允许一个线程去使用，其他线程必须等待，知道占用占用资源者释放该资源。线程互斥可以看成是一种特殊的线程同步。
 
     线程间的同步方法大体可以分为两类:
 
     1. 用户模式(使用时不需要切换内核态，只在用户态完成操作)：
 
-        **临界区**：适合一个进程内的多线程访问公共区域或代码段时使用
+        **临界区**：通过对多线程的串行化来访问公共资源或一段代码，适合一个进程内的多线程访问公共区域或代码段时使用
 
     2. 内核模式(利用系统内核对象的单一性来进行同步，使用时需要切换内核态与用户态)：
 
-        **事件**：通过线程间触发事件实现同步互斥
+        **事件**：用来通知线程有一些事件已发生，从而启动后继任务的开始。通过线程间触发事件实现同步互斥
 
-        **互斥量**：适合不同进程内多线程访问公共区域或代码段时使用，与临界区相似
+        **互斥量**：互斥量跟临界区很相似，只有拥有互斥对象的线程才具有访问资源的权限，由于互斥对象只有一个，因此就决定了任何情况下此共享资源都不会同时被多个线程所访问。适合不同进程内多线程访问公共区域或代码段时使用，与临界区相似
 
         **信号量**：与临界区和互斥量不同，可以实现多个线程同时访问公共区域数据，原理与操作系统中PV操作类似，先设置一个访问公共区域的线程最大连接数，每有一个线程访问共享区资源数就减一，直到资源数小于等于零。
 
@@ -51,9 +51,9 @@ tags: C++
 
 
 
-### 2 C++ 多线程编程
+### 2 线程创建
 
-+ C++11中提供了thread库管理线程、保护共享数据、线程间同步等功能。头文件是`#include<thread>`。一个进程至少要有一个线程，在C++中可以认为main函数就是我们的主线程。而在创建thread对象的时候，就是在这个线程之外创建了一个独立的子线程。只要创建了这个子线程并且开始运行了，主线程就完全和它没有关系了，不知道CPU会什么时候调度它运行，什么时候结束运行。
++ C++11中提供了thread库管理线程、保护共享数据、线程间同步等功能。头文件是`#include<thread>`。一个进程至少要有一个线程，在C++中可以认为main函数就是我们的主线程。而在创建thread对象的时候，就是在这个线程之外创建了一个独立的子线程。**只要创建了这个子线程并且开始运行了( 线程创建即运行 )**，主线程就完全和它没有关系了，不知道CPU会什么时候调度它运行，什么时候结束运行。
 
 + 线程的创建方式
 
@@ -76,7 +76,7 @@ tags: C++
     }
     ```
 
-    1.1 使用`join()`函数加入，汇合线程、阻塞主线程，等待子线程结束，才会回到主线程。
+    1.1 使用`join()`函数加入，汇合线程、阻塞主线程，等待子线程结束，才会回到主线程，继续执行主线程的内容。
 
     ```cpp
     int main()
@@ -244,6 +244,145 @@ tags: C++
         cout << "main thread end" << endl;
     }
     ```
+
+### 3 互斥锁的使用
+
++ `mutex`
+
+    `mutex`是一个基本的互斥锁，其可以通过`lock()`进行加锁，`unlock()`进行解锁。示例如下;
+
+    ```cpp
+    #include<iostream>
+    #include<thread>
+    #include<mutex>
+
+    int a = 0;
+    mutex _mutex;
+    void foo()
+    {
+        for (int i = 0; i < 10000000; ++i)
+        {
+            _mutex.lock();
+            a += 1;
+            _mutex.unlock();
+        }
+    }
+    int main()
+    {
+        thread t1(foo);
+        thread t2(foo);
+        t1.join();
+        t2.join();
+        return 0;
+    }
+    ```
+
+    在C++中，通过构造`std::mutex`的实例创建互斥元，调用成员函数lock()来锁定它，调用unlock()来解锁，这能满足我们的需求。不过一般不推荐这种做法，lock()和unlock()是成对出现的，需要手动解锁，若在手动释放锁前程序异常，没有调用unlock(),这个资源会一直被锁着，没发释放，会导致其他异常。
+
++ `lock_guard`
+
+    标准C++库提供了`std::lock_guard`类模板，实现了互斥元的RAII惯用语法。`std::mutex`和`std::lock _ guard`。都声明在`< mutex >`头文件中。
+
+    注意：析构时自动释放，不能手动调用unlock()，否则析构时再次调用，会报异常。
+
+    在作用域内创建`lock_guard`对象时，会尝试获得锁`(mutex::lock())`，没有获得就像其他锁一样阻塞在原地。在`lock_guard`的析构函数内会释放锁`(mutex::unlock())`，不需要我们手动释放。
+
+    示例如下：
+
+    ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <mutex>
+
+    using namespace std;
+
+    mutex m_lock;
+
+    void print(int && num)
+    {
+        lock_guard<mutex> lock(m_lock); // 创建lock_guard，并加锁
+        cout<<"thread id is :"<<num<<endl;
+        // 此处无需手动解锁，当超过此作用域，lock自动析构，进行解锁
+    }
+
+    int main()
+    {
+        thread t1(print, 1 );
+        thread t2(print, 2);
+        t1.join();
+        t2.join();
+        cout << "main thread end" << endl;
+        return 0;
+    }
+    ```
+
++ `unique_lock`
+
+    unique_lock是对mutex的一种RAII使用手法，unique_lock是lock_guard的加强版，它具有 lock_guard 的所有功能，同时具有如下特点：
+
+    + 创建时可以不锁定（通过指定第二个参数为std::defer_lock）
+
+    + 可以随时加锁解锁（通过lock，try_lock, unlock）
+
+    + 允许延迟锁定（通过try_lock_for），限时锁定（通过 try_lock_until）
+
+    + 不可复制，可移动（通过移动构造函数或移动赋值函数转移所有权）
+
+    + 可以主动释放所有权（通过release）
+
+    + 作用域规则同 lock_grard，析构时自动释放锁
+
+    + 条件变量需要该类型的锁作为参数
+
+    unique_lock也是一个类，如`unique_lock<mutex> lck(m)`，就是创建了一个unique_lock对象lck，并将其与互斥量m绑定，**同时对其上锁**， 创建对象默认加锁。
+
+    与lock_guard不同的是，unique_lock可以进行临时解锁和再上锁，如在构造对象之后使用lck.unlock()就可以进行解锁，lck.lock()进行上锁，而不必等到析构时自动解锁。unique_lock在析构时也会自动解锁。
+
+    除此之外，unique_lock还接受第二个参数来进行构造。两个参数构造的形式有以下几种：
+
+    + unique_lock<mutex> lck(m,adopt_lock)：用互斥量来初始化unique_lock对象，但是构造时不会自动lock()；
+
+    + unique_lock<mutex> lck(m,defer_lock)：仅仅是将lck与m绑定，不会自动进行lock()和unlock()；
+
+    + unique_lock<mutex> lck(m,try_to_lock)：将lck与m绑定，并且尝试对其进行加锁，如果加锁失败也不会阻塞，加锁是否成功可以根据lck.owns_lock()来判断是否加锁成功；    
+
+    使用示例：
+
+    ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <mutex>
+
+    using namespace std;
+
+    mutex m_lock;
+
+    void print(int && num)
+    {
+        unique_lock<mutex> lock(m_lock); // 创建unique_lock，并加锁
+        cout<<"thread id is :"<<num<<endl;
+        // 此处无需手动解锁，当超过此作用域，lock自动析构，进行解锁
+    }
+
+    int main()
+    {
+        thread t1(print, 1 );
+        thread t2(print, 2);
+        t1.join();
+        t2.join();
+        cout << "main thread end" << endl;
+        return 0;
+    }
+    ```
+
+
+### 4 线程同步
+
++ 详情见 [C++ 线程同步](https://cafory.github.io/2022/08/26/cpp-thread-synchronization.html)
+
+
+
+
 
 
 
